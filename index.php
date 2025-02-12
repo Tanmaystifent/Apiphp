@@ -1,27 +1,32 @@
 <?php
-if (isset($_GET['prompt'])) {
-    $prompt = $_GET['prompt'];
-    $apiKey = "AIzaSyCdPw0kiJnQhxPbANaT7kU35zUpve3rDU0"; // Your Gemini API Key
-    $apiURL = "https://generativelanguage.googleapis.com/v1beta2/models/gemini-pro:generateText?key=" . $apiKey;
+// Get user prompt
+$prompt = isset($_GET['prompt']) ? $_GET['prompt'] : 'Hello';
 
-    $postData = json_encode([
-        "prompt" => ["text" => $prompt]
-    ]);
+// Gemini API Key
+$api_key = "AIzaSyCdPw0kiJnQhxPbANaT7kU35zUpve3rDU0";
 
-    $options = [
-        "http" => [
-            "header" => "Content-Type: application/json",
-            "method" => "POST",
-            "content" => $postData
-        ]
-    ];
+// Gemini API URL
+$url = "https://generativelanguage.googleapis.com/v1beta2/models/gemini-pro:generateText?key=$api_key";
 
-    $context = stream_context_create($options);
-    $result = file_get_contents($apiURL, false, $context);
-    
-    header("Content-Type: application/json");
-    echo $result;
-} else {
-    echo json_encode(["error" => "No prompt provided."]);
-}
+// Prepare request data
+$data = json_encode([
+    "prompt" => [
+        "text" => $prompt
+    ]
+]);
+
+// Send request to Gemini API
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+// Return API response
+header('Content-Type: application/json');
+echo $response;
 ?>
