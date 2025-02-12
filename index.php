@@ -1,31 +1,27 @@
 <?php
 if (isset($_GET['prompt'])) {
-    $prompt = urlencode($_GET['prompt']);
-    $api_key = "AIzaSyCdPw0kiJnQhxPbANaT7kU35zUpve3rDU0";  // Replace with your API key
+    $prompt = $_GET['prompt'];
+    $apiKey = "AIzaSyCdPw0kiJnQhxPbANaT7kU35zUpve3rDU0"; // Your Gemini API Key
+    $apiURL = "https://generativelanguage.googleapis.com/v1beta2/models/gemini-pro:generateText?key=" . $apiKey;
 
-    $api_url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=$api_key";
-
-    $data = [
-        "contents" => [["parts" => [["text" => $prompt]]]]
-    ];
+    $postData = json_encode([
+        "prompt" => ["text" => $prompt]
+    ]);
 
     $options = [
         "http" => [
-            "header"  => "Content-Type: application/json\r\n",
-            "method"  => "POST",
-            "content" => json_encode($data),
+            "header" => "Content-Type: application/json",
+            "method" => "POST",
+            "content" => $postData
         ]
     ];
 
-    $context  = stream_context_create($options);
-    $result = file_get_contents($api_url, false, $context);
-
-    if ($result === FALSE) {
-        echo json_encode(["response" => "Error connecting to Gemini API."]);
-    } else {
-        echo $result;
-    }
+    $context = stream_context_create($options);
+    $result = file_get_contents($apiURL, false, $context);
+    
+    header("Content-Type: application/json");
+    echo $result;
 } else {
-    echo json_encode(["response" => "No prompt provided."]);
+    echo json_encode(["error" => "No prompt provided."]);
 }
 ?>
