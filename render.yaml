@@ -1,0 +1,11 @@
+services:
+  - name: php-api
+    type: web
+    runtime: php
+    repo: https://github.com/YOUR_GITHUB/php-api
+    branch: main
+    envVars:
+      - key: PORT
+        value: 80
+    buildCommand: ""
+    startCommand: "php -S 0.0.0.0:80"
